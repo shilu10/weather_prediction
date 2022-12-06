@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kafka-producer-secrets
+type: Opaque
+data:
+  api_key: ZTVkMjdiMTE3MzE2NGU1ZWMxYTgwM2Q5YTZlMWYxYmQ=
+  bootstrap_server: bXktY2x1c3Rlci1rYWZrYS1ib290c3RyYXA6OTA5Mg==
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-producer-deployment
+  labels:
+    app: kafka-producer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-producer
+  template:
+    metadata:
+      labels:
+        app: kafka-producer
+    spec:
+      containers:
+      - name: kafka-producer
+        image: 18bit048/weather-project-producer
+        envFrom:
+          - secretRef:
+              name: kafka-producer-secrets

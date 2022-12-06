@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-consumer-secrets
+type: Opaque
+data:
+  api_key: ZTVkMjdiMTE3MzE2NGU1ZWMxYTgwM2Q5YTZlMWYxYmQ=
+  bootstrap_server: bXktY2x1c3Rlci1rYWZrYS1ib290c3RyYXA6OTA5Mg==
+  mongodb_url: bW9uZ29kYitzcnY6Ly9zaGlsdTpzaGlsdUBjbHVzdGVyMC51d2loYzZpLm1vbmdvZGIubmV0Lz9yZXRyeVdyaXRlcz10cnVlJnc9bWFqb3JpdHkK
+  prediction_topic_name: cHJlZGljdGlvbnM=
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-consumer-deployment
+  labels:
+    app: mongodb-consumer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-consumer
+  template:
+    metadata:
+      labels:
+        app: mongodb-consumer
+    spec:
+      containers:
+      - name: mongodb-consumer
+        image: 18bit048/mongodb-consumer
+        envFrom:
+          - secretRef:
+              name: mongodb-consumer-secrets

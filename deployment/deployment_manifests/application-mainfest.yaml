@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flask-backend-secrets
+type: Opaque
+data:
+  mongodb_url: bW9uZ29kYitzcnY6Ly9zaGlsdTpzaGlsdUBjbHVzdGVyMC51d2loYzZpLm1vbmdvZGIubmV0Lz9yZXRyeVdyaXRlcz10cnVlJnc9bWFqb3JpdHk=
+  api_key: ZTVkMjdiMTE3MzE2NGU1ZWMxYTgwM2Q5YTZlMWYxYmQ=
+
+
+---
+
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: live-dashboard-secrets
+type: Opaque
+data:
+  mongodb_url: bW9uZ29kYitzcnY6Ly9zaGlsdTpzaGlsdUBjbHVzdGVyMC51d2loYzZpLm1vbmdvZGIubmV0Lz9yZXRyeVdyaXRlcz10cnVlJnc9bWFqb3JpdHkK
+
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-project-backend-deployment
+  labels:
+    app: weather-project-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-project-backend
+  template:
+    metadata:
+      labels:
+        app: weather-project-backend
+    spec:
+      containers:
+      - name: weather-project-backend-container
+        image: 18bit048/weather-project-backend
+        ports:
+        - containerPort: 8000
+        envFrom:
+          - secretRef:
+              name: flask-backend-secrets
+
+      - name: live-weather-dashboard-container
+        image: 18bit048/live-weather-dashboard
+        ports:
+        - containerPort: 8501
+        envFrom:
+          - secretRef:
+              name: live-dashboard-secrets
+
+      - name: history-weather-dashboard-container
+        image: 18bit048/history-weather-dashboard
+        ports:
+        - containerPort: 8502
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-project-backend-svc
+spec:
+  type: NodePort
+  selector:
+    app: weather-project-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+      nodeport: 30009
+  
